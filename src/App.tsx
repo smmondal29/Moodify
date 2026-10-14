@@ -101,3 +101,71 @@ export default function App() {
         setIsMuted(true);
       }
     }
+  };
+
+  return (
+    <main>
+      <h1><Music aria-hidden="true" /> Moodify</h1>
+      <section aria-label="Music player">
+        <img src={currentSong.cover} alt={`Cover for ${currentSong.title}`} width={300} height={300} />
+        <h2>{currentSong.title}</h2>
+        <p>{currentSong.artist}</p>
+        <audio
+          ref={audioRef}
+          src={currentSong.src}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={() => {
+            if (audioRef.current) {
+              audioRef.current.volume = isMuted ? 0 : volume;
+            }
+            handleTimeUpdate();
+          }}
+          onEnded={handleNext}
+        />
+        <div>
+          <button type="button" onClick={handlePrev} aria-label="Previous song">
+            <SkipBack aria-hidden="true" />
+          </button>
+          <button type="button" onClick={togglePlay} aria-label={isPlaying ? 'Pause' : 'Play'}>
+            {isPlaying ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
+          </button>
+          <button type="button" onClick={handleNext} aria-label="Next song">
+            <SkipForward aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => setLiked(!liked)} aria-label="Like song" aria-pressed={liked}>
+            <Heart aria-hidden="true" fill={liked ? 'currentColor' : 'none'} />
+          </button>
+        </div>
+        <label>
+          Playback position
+          <input type="range" min={0} max={duration} step={0.1} value={currentTime} onChange={handleSeek} />
+        </label>
+        <div>
+          <button type="button" onClick={toggleMute} aria-label={isMuted ? 'Unmute' : 'Mute'}>
+            {isMuted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
+          </button>
+          <label>
+            Volume
+            <input type="range" min={0} max={1} step={0.01} value={isMuted ? 0 : volume} onChange={handleVolumeChange} />
+          </label>
+        </div>
+      </section>
+      <section aria-label="Playlist">
+        <h2><Disc aria-hidden="true" /> Playlist</h2>
+        <ol>
+          {PLAYLIST.map((song, index) => (
+            <li key={song.id}>
+              <button
+                type="button"
+                onClick={() => setCurrentIndex(index)}
+                aria-current={index === currentIndex ? 'true' : undefined}
+              >
+                {song.title} — {song.artist}
+              </button>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </main>
+  );
+}
